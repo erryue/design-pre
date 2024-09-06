@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre Task 1</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .figure-img {
+            width: 100%;
+            height: auto;
+        }
+        .rating-label {
+            margin-right: 10px;
+        }
+        .col-md-2 {
+            padding-left: 0;
+            padding-right: 0.1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <header class="text-center mb-4">
+            <h1>[Pre] Task 1</h1>
+            <br>
+        </header>
+        <main>
+            <p>In Task 1, AI is used to assist in designing future vehicle concepts. eight groups of AI-generated images are shown below. Please rate the quality of each image based on the following criteria, with 1 being very poor and 5 being very good.</p>
+            <p> 任务一中，AI系统被用于辅助未来车辆的概念草图设计。下面展示了AI生成的8组图像，请根据以下原则评价每张图像的质量，1表示非常差，5表示非常好。</p>
+            <ul>
+                <li style="margin-bottom: 10px;">Creativity: Design concept is novel and unique, and sparks design inspiration. <br>创意性：设计构思新颖独特，能激发设计灵感</li>
+                <li style="margin-bottom: 10px;">Detail Richness: Design intent is clearly expressed. <br>细节丰富度：设计意图表达清晰</li>
+            </ul>
+            <br>
+            <p>Group 7 组七</p>
+            <form id="form3" action="https://script.google.com/macros/s/AKfycbztXXzIFEvzhk6GJYusFRfZwXBopWFG6ToammuxtAsb5KD29jXVdD-rs9Mn_y5DQJSR/exec" method="POST">
+                <div id="mainContainer"></div>
+                <div class="text-center">
+                    <button class="btn btn-primary mt-5 mb-5" type="submit">Next &nbsp; 下一组</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        const imageFolder = '../ImagePool/';
+        const imageSets = ['A7','A7L'];
+        const imagesPerContainer = 6;
+        const mainContainer = document.getElementById('mainContainer');
+
+        let imageFilenames = [];
+        imageSets.forEach(set => {
+            for (let i = 1; i <= 20; i++) {
+                imageFilenames.push(`${set}/${set}_${String(i).padStart(2, '0')}.png`);
+            }
+        });
+
+        imageFilenames = imageFilenames.sort(() => Math.random() - 0.5);
+        sessionStorage.setItem('images', JSON.stringify(imageFilenames));
+
+        for (let i = 0; i < Math.ceil(imageFilenames.length / imagesPerContainer); i++) {
+            const containerRow = document.createElement('div');
+            containerRow.className = 'row mb-4';
+
+            for (let j = 0; j < imagesPerContainer; j++) {
+                const index = i * imagesPerContainer + j;
+
+                if (index < imageFilenames.length) {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-2';
+
+                    const figure = document.createElement('figure');
+                    figure.className = 'text-center';
+
+                    const img = document.createElement('img');
+                    img.className = 'figure-img img-fluid rounded';
+                    img.src = `${imageFolder}${imageFilenames[index]}`;
+                    img.alt = `Image ${index + 1}`;
+
+                    const caption = document.createElement('figcaption');
+                    caption.className = 'mt-2';
+
+                    // Create rating options
+                    for (let rating = 1; rating <= 5; rating++) {
+                        const label = document.createElement('label');
+                        label.className = 'rating-label';
+                        label.innerText = rating;
+
+                        const input = document.createElement('input');
+                        input.type = 'radio';
+                        input.name = `rating-${index}`;
+                        input.value = rating;
+                        input.required = true;
+
+                        label.prepend(input);
+                        caption.appendChild(label);
+                    }
+
+                    figure.appendChild(img);
+                    figure.appendChild(caption);
+                    col.appendChild(figure);
+                    containerRow.appendChild(col);
+                }
+            }
+
+            mainContainer.appendChild(containerRow);
+        }
+    </script>
+
+    <script>
+        document.getElementById('form3').addEventListener('submit', function(event) {
+            
+            const storedImages = JSON.parse(sessionStorage.getItem('images'));
+
+            storedImages.forEach((filename, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'imageFilenames[]'; 
+                hiddenInput.value = filename;
+                this.appendChild(hiddenInput);
+
+                const selectedRating = document.querySelector(`input[name="rating-${index}"]:checked`);
+                if (selectedRating) {
+                    const hiddenRatingInput = document.createElement('input');
+                    hiddenRatingInput.type = 'hidden';
+                    hiddenRatingInput.name = 'ratings[]';
+                    hiddenRatingInput.value = selectedRating.value;
+                    this.appendChild(hiddenRatingInput);
+                }
+            });
+
+            this.submit(); 
+
+            setTimeout(() => {    
+                window.location.href = 'pre_A8.html';
+            }, 500);
+        });
+    </script>
+
+</body>
+</html>

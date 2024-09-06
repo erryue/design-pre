@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre Task 2</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .figure-img {
+            width: 100%;
+            height: auto;
+        }
+        .rating-label {
+            margin-right: 10px;
+        }
+        .col-md-3 {
+            padding-left: 0;
+            padding-right: 0.1;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <header class="text-center mb-4">
+            <h1>[Pre] Task 2</h1>
+            <br>
+        </header>
+        <main>
+            <div class="row">
+                <div class="col-md-8">
+                    <p>In Task 2, AI is used to assist in UI color design, with the UI template shown on the right. Eight groups of AI-generated images are shown below. Please rate the quality of each image based on the following criteria, with 1 being very poor and 5 being very good.</p>
+                    <p>在任务二中，AI系统被用于辅助UI配色设计，UI模版如右图所示。下面展示了AI生成的8组图像，请根据以下原则为每张图像的质量进行评分，1表示非常差，5表示非常好。</p>
+                        <ul>
+                            <li style="margin-bottom: 10px;">Visual Appeal: The color scheme is harmonious and pleasing. <br>视觉吸引力：配色和谐令人愉悦</li>
+                            <li style="margin-bottom: 10px;">Consistency: The color scheme is consistent throughout the design. <br>一致性：配色在设计中保持一致</li>
+                            <li style="margin-bottom: 10px;">Readability: Text and icons are clear and legible. <br>可读性：文本和图标清晰可见</li>
+                        </ul>
+                </div>
+                <div class="col-md-4">
+                    <img src="template.png" alt="UI Template" class="img-fluid">
+                </div>
+            </div>
+            <br>
+            <p>Group 2 组二</p>
+            <form id="form3" action="https://script.google.com/macros/s/AKfycbztXXzIFEvzhk6GJYusFRfZwXBopWFG6ToammuxtAsb5KD29jXVdD-rs9Mn_y5DQJSR/exec" method="POST">
+                <div id="mainContainer"></div>
+                <div class="text-center">
+                    <button class="btn btn-primary mt-5 mb-5" type="submit">Next &nbsp; 下一组</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        const imageFolder = '../ImagePool/';
+        const imageSets = ['B2','B2L'];
+        const imagesPerContainer = 4;
+        const mainContainer = document.getElementById('mainContainer');
+
+        let imageFilenames = [];
+        imageSets.forEach(set => {
+            for (let i = 1; i <= 20; i++) {
+                imageFilenames.push(`${set}/${set}_${String(i).padStart(2, '0')}.png`);
+            }
+        });
+
+        imageFilenames = imageFilenames.sort(() => Math.random() - 0.5);
+        sessionStorage.setItem('images', JSON.stringify(imageFilenames));
+
+        for (let i = 0; i < Math.ceil(imageFilenames.length / imagesPerContainer); i++) {
+            const containerRow = document.createElement('div');
+            containerRow.className = 'row mb-4';
+
+            for (let j = 0; j < imagesPerContainer; j++) {
+                const index = i * imagesPerContainer + j;
+
+                if (index < imageFilenames.length) {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3';
+
+                    const figure = document.createElement('figure');
+                    figure.className = 'text-center';
+
+                    const img = document.createElement('img');
+                    img.className = 'figure-img img-fluid rounded';
+                    img.src = `${imageFolder}${imageFilenames[index]}`;
+                    img.alt = `Image ${index + 1}`;
+
+                    const caption = document.createElement('figcaption');
+                    caption.className = 'mt-2';
+
+                    // Create rating options
+                    for (let rating = 1; rating <= 5; rating++) {
+                        const label = document.createElement('label');
+                        label.className = 'rating-label';
+                        label.innerText = rating;
+
+                        const input = document.createElement('input');
+                        input.type = 'radio';
+                        input.name = `rating-${index}`;
+                        input.value = rating;
+                        input.required = true;
+
+                        label.prepend(input);
+                        caption.appendChild(label);
+                    }
+
+                    figure.appendChild(img);
+                    figure.appendChild(caption);
+                    col.appendChild(figure);
+                    containerRow.appendChild(col);
+                }
+            }
+
+            mainContainer.appendChild(containerRow);
+        }
+    </script>
+
+    <script>
+        document.getElementById('form3').addEventListener('submit', function(event) {
+            
+            const storedImages = JSON.parse(sessionStorage.getItem('images'));
+
+            storedImages.forEach((filename, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'imageFilenames[]'; 
+                hiddenInput.value = filename;
+                this.appendChild(hiddenInput);
+
+                const selectedRating = document.querySelector(`input[name="rating-${index}"]:checked`);
+                if (selectedRating) {
+                    const hiddenRatingInput = document.createElement('input');
+                    hiddenRatingInput.type = 'hidden';
+                    hiddenRatingInput.name = 'ratings[]';
+                    hiddenRatingInput.value = selectedRating.value;
+                    this.appendChild(hiddenRatingInput);
+                }
+            });
+
+            this.submit(); 
+
+            setTimeout(() => {    
+                window.location.href = 'pre_B3.html';
+            }, 500);
+        });
+    </script>
+
+</body>
+</html>
